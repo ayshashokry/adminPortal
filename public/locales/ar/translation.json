@@ -1,0 +1,36 @@
+{
+  "and": ",",
+  "auth": {
+    "login": "تسجيل الدخول",
+    "welcomeBack": "Welcome back! Please enter your details.",
+    "forgetPassword": "Forget Password",
+    "email": "البريد الالكتروني",
+    "userPhoto": "صورة المستخدم",
+    "name": "الاسم",
+    "mobile": "رقم الجوال",
+    "password": "كلمة المرور",
+    "oldPassword": "old password",
+    "newPassword": "new password",
+    "rePassword": "Rewrite Password",
+    "confirmPassword": "confirm Password",
+    "otp": "الكود",
+    "submit": "submit",
+    "confirm": "confirm",
+    "signIn": "sign in",
+    "verify":"Verify",
+    "createNewPass": "انشاء كلمة مرور جديدة",
+    "enterPassword": "Please enter the new password you need.",
+    "termsConditions": "الشروط والاحكام",
+    "privacyPolicy": " Privacy Policy",
+    "theCodeSent": "تم ارسال الكود الي",
+    "forgetYourPass": "نسيت كلمة المرور؟",
+    "CongratsPasswordChanged": "Password Changed Congratulations!",
+    "passworRestSuccess": "Your Password Reseting Successfully",
+    "enter": {
+      "please": "من فضلك",
+      "enter": "أدخل"
+    }
+  },
+  "language":"EN"
+
+}

@@ -1,0 +1,36 @@
+{
+  "and": "and",
+  "auth": {
+    "login": "Log In",
+    "welcomeBack": "Welcome back! Please enter your details.",
+    "forgetPassword": "Forget Password",
+    "email": "email",
+    "userPhoto": "user photo",
+    "name": "name",
+    "mobile": "mobile number",
+    "password": "password",
+    "oldPassword": "old password",
+    "newPassword": "new password",
+    "rePassword": "Rewrite Password",
+    "confirmPassword": "confirm Password",
+    "otp": "otp",
+    "submit": "submit",
+    "confirm": "confirm",
+    "signIn": "sign in",
+    "verify":"Verify",
+    "createNewPass": "Create New Password",
+    "enterPassword": "Please enter the new password you need.",
+    "termsConditions": "Terms & Conditions",
+    "privacyPolicy": " Privacy Policy",
+    "theCodeSent": "the code sent to",
+    "forgetYourPass": "Forget your password?",
+    "CongratsPasswordChanged": "Password Changed Congratulations!",
+    "passworRestSuccess": "Your Password Reseting Successfully",
+    "enter": {
+      "please": "Please",
+      "enter": "enter your"
+    }
+  },
+  "language":"العربية"
+
+}

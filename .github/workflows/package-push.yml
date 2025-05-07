@@ -1,0 +1,105 @@
+name: Build application and push to registry
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    branches:
+      - dev
+      - uat
+      - prod
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: What Environment/Branch to Use
+        required: true
+        type: choice
+        options:
+          - dev
+          - uat
+          - prod
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set Environment
+        run: echo "TARGET_ENV=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Set Manual Environment
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: echo "TARGET_ENV=${{ inputs.target_env }}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect API Endpoint [Based on Environment]
+        run: |
+          if [[ ${{ env.TARGET_ENV }} == 'dev' ]]; then
+            echo "BASE_URL=https://dev-api.salesfine.co/api/" >> $GITHUB_ENV
+          elif [[ ${{ env.TARGET_ENV }} == 'uat' ]]; then
+            echo "BASE_URL=https://uat-api.salesfine.co/api/" >> $GITHUB_ENV
+          elif [[ ${{ env.TARGET_ENV }} == 'prod' ]]; then
+            echo "BASE_URL=https://api.salesfine.co/api/" >> $GITHUB_ENV
+          else
+            echo "Could not set 'BASE_URL', variable TARGET_ENV is not within expected values"
+            exit 1
+          fi
+
+      - name: Assign NODE_ENV variable
+        run: |
+          if [[ "${{ env.TARGET_ENV }}" == "dev" ]]; then
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          elif [[ "${{ env.TARGET_ENV }}" == "uat" ]]; then
+            echo "NODE_ENV=development" >> $GITHUB_ENV
+          elif [[ "${{ env.TARGET_ENV }}" == "prod" ]]; then
+            echo "NODE_ENV=production" >> $GITHUB_ENV
+          fi
+
+      - name: Assign "latest" Tag
+        run: |
+          if [[ "${{ env.TARGET_ENV }}" == "dev" ]]; then
+            echo "LATEST_TAG=dev-latest" >> $GITHUB_ENV
+          elif [[ "${{ env.TARGET_ENV }}" == "uat" ]]; then
+            echo "LATEST_TAG=uat-latest" >> $GITHUB_ENV
+          elif [[ "${{ env.TARGET_ENV }}" == "prod" ]]; then
+            echo "LATEST_TAG=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Prepare DateTime Tag
+        run: echo "IMAGE_DATETIME=$(date +%Y-%m-%d-%H.%M.%S)" >> $GITHUB_ENV
+
+      - name: Build, Tag and Push Image to Github Registry
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/salesfine/admin-portal-ui:${{ env.TARGET_ENV }}-${{ env.IMAGE_DATETIME }}
+            ghcr.io/salesfine/admin-portal-ui:${{ env.LATEST_TAG }}
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=${{ env.BASE_URL }}
+
+  dispatch:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: trigger deployment
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CI_CD_PIPELINE_TOKEN }}
+          repository: salesfine/salesfine-deploy
+          event-type: deploy-admin-portal-ui
+          client-payload: '{ "target_env": "${{ github.ref_name }}", "target_app": "admin-portal-ui" }'
