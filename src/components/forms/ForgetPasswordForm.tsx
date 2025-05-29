@@ -2,30 +2,20 @@
 
 import CustomForm from "./CustomForm";
 import { authInterface } from "@/hooks/auth/auth.interface";
-import useAuth from "@/hooks/auth/usAuth";
+import useAuth from "@/hooks/auth/useAuth";
 import { useRouter } from "next/navigation";
-import _ from "lodash";
 import { emailSchema } from "@/utils/validtions/EmailSchema";
 import { useState } from "react";
 import { LockClosedIcon } from "@radix-ui/react-icons";
 import MessageToaster from "../modals/MessageToaster";
 import Loading from "../layout/Loading";
-import AuthLayout from "@/app/auth/AuthLayout";
-import { useTranslation } from "react-i18next";
+import { capitalizeString } from "@/utils/helpers";
+import AuthLayout from "@/app/(unauth)/auth/AuthLayout";
+import { forgetPassFields } from "@/data/formsFields";
 // type ForgetPasswordFormValues = z.infer<typeof emailSchema>;
 
 export default function ForgetPasswordForm() {
-  const [formFields] = useState([
-    {
-      id: 1,
-      name: "email",
-      label: _.capitalize("email"),
-      placeholder: `Please enter your email`,
-      type: "email",
-      required: true,
-      icon: <LockClosedIcon className="w-5 h-5" />,
-    },
-  ]);
+ 
   const defaultValues = {
     email: "",
   };
@@ -48,21 +38,21 @@ export default function ForgetPasswordForm() {
       setMessage(result?.data?.message);
     }
   };
-    const { i18n } = useTranslation("translation");
-  
+
   return (
     <AuthLayout
       // title={t("auth.forgetPassword")}
       // headText={`${t("auth.enter.please")} ${t("auth.enter.enter")} ${t(
       //   "auth.email"
       // )}`}
-i18n={i18n}
+      // i18n={i18n}
       title="Forget Password"
       headText="Please enter your email"
     >
       {isLoading && <Loading />}
       {error && (
         <MessageToaster
+          key={error?.data?.message}
           toastStyle="border-red4 bg-red2"
           title="Failed!"
           description={error?.data?.message}
@@ -82,9 +72,9 @@ i18n={i18n}
         />
       )}
       <CustomForm
-        buttonTitle={_.capitalize("submit")}
+        buttonTitle={capitalizeString("submit")}
         formType="forgetPassword"
-        fields={[...formFields]}
+        fields={[...forgetPassFields]}
         onSubmitFunc={onSubmitFunc}
         methods={methods}
       />

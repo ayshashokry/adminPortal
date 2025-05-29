@@ -2,40 +2,34 @@
 import CustomForm from "./CustomForm";
 import { otpInterface } from "@/hooks/auth/auth.interface";
 import useAuthStore from "@/store/authStore";
-import useAuth from "@/hooks/auth/usAuth";
+import useAuth from "@/hooks/auth/useAuth";
 import { otpSchema } from "@/utils/validtions/OtpSchema";
-import _ from "lodash";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MessageToaster from "../modals/MessageToaster";
 import ResendOtp from "../auth/resendOtp";
+import { capitalizeString } from "@/utils/helpers";
+import Loading from "../layout/Loading";
 
 export default function OtpVerificationForm({
   urlEmail,
 }: {
   urlEmail: string;
 }) {
-  // const [otpExpired, setOtpExpired] = useState(false);
-  // const [otpRecievedAt] = useState<number>(Date.now());
   const [otpValue, setOtp] = useState<string>();
   const [message, setMessage] = useState("");
 
   const { setAuth } = useAuthStore();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setOtpExpired(true);
-  //   }, OTP_EXPIRY_TIME);
-
-  //   return () => clearTimeout(timer);
-  // }, []);
   const defaultValues = {
-    email: "",
     otp: "",
   };
 
-  const { methods, error, onSubmit } = useAuth<typeof otpSchema, otpInterface>({
+  const { methods, error, onSubmit, isLoading } = useAuth<
+    typeof otpSchema,
+    otpInterface
+  >({
     endPoint: "auth/admin/verify-otp",
     schema: otpSchema,
     defaultValues,
@@ -53,17 +47,12 @@ export default function OtpVerificationForm({
     const result = await onSubmit(updatedData);
     if (result?.data?.data) {
       setAuth(
+        true,
         result?.data?.data?.tokens.access,
-        result?.data?.data?.user,
-        result?.data?.data?.tokens?.refresh
+        result?.data?.data?.tokens?.refresh,
+        result?.data?.data?.user
       );
-      setTimeout(() => {
-        setAuth(
-          result?.data?.data?.tokens.refresh,
-          result?.data?.data?.user,
-          result?.data?.data?.tokens?.refresh
-        );
-      }, 5 * 60000);
+
       router.push("/dashboard/user");
       setMessage(result?.data?.message);
     }
@@ -71,7 +60,9 @@ export default function OtpVerificationForm({
   const handleOtpChange = (value: string) => {
     setOtp(value);
   };
-  return (
+  return isLoading ? (
+    <Loading />
+  ) : (
     <>
       {error && (
         <MessageToaster
@@ -84,7 +75,7 @@ export default function OtpVerificationForm({
         />
       )}
       <CustomForm
-        buttonTitle={_.capitalize("Verify")}
+        buttonTitle={capitalizeString("Verify")}
         formType="otpVerify"
         fields={[...formFields]}
         onSubmitFunc={onSubmitFunc}
@@ -92,7 +83,10 @@ export default function OtpVerificationForm({
         otpValue={otpValue}
         setOtpValue={handleOtpChange}
       />
-      <ResendOtp />
+      <ResendOtp
+        content="Didn’t receive an email or OTP expired ? Click to resend"
+        endPoint="auth/admin/resend-otp"
+      />
       {message && (
         <MessageToaster
           toastStyle="border-green bg-green1"

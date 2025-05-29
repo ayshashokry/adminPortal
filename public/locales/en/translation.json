@@ -5,6 +5,9 @@
     "welcomeBack": "Welcome back! Please enter your details.",
     "forgetPassword": "Forget Password",
     "email": "email",
+        "enterEmail":"Please enter your email",
+            "enterLogPassword":"Please enter your password",
+
     "userPhoto": "user photo",
     "name": "name",
     "mobile": "mobile number",
@@ -30,6 +33,10 @@
       "please": "Please",
       "enter": "enter your"
     }
+  },
+  "lists":{
+"userList":"User List"
+
   },
   "language":"العربية"
 

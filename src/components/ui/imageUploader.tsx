@@ -1,27 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import uploadCloudImg from "@/assets/images/upload-cloud.svg";
-export default function ImageUploader() {
-  // const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+import { FieldValues, Path } from "react-hook-form";
+import useAuthStore from "@/store/authStore";
+import { UploadImage } from "@/api/uploadImage";
+import MessageToaster from "../modals/MessageToaster";
+import Loading from "../layout/Loading";
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File size should be less than 5MB");
-        return;
-      }
-      // setSelectedImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
+interface ImageUploaderProps<T extends FieldValues> {
+  field?: {
+    id: number;
+    name: Path<T>; 
+    label?: string;
+    placeholder?: string;
+    type: string;
+    required: boolean;
+    icon?: React.ReactNode;
+    fullWidth?: boolean;
+  };
+  key: number;
+  getImgValue?: (imgUUID: string) => void;
+  imageValue: string;
+}
+
+export default function ImageUploader<T extends FieldValues>({
+  field,
+  getImgValue,
+  imageValue,
+}: ImageUploaderProps<T>) {
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { token } = useAuthStore();
+
+  // Upload image function
+  const onUploadImg = async (file: File) => {
+    setIsLoading(true);
+    const result = await UploadImage({
+      token,
+      file,
+      imageType: "PROFILE_IMAGE",
+    });
+    if (result?.data) {
+      setIsLoading(false);
+      setMessage(result?.data?.message);
+      return result.data;
+    } else {
+      setIsLoading(false);
+      setError(result?.message);
     }
   };
 
+  // Effect to update previewUrl whenever imageValue changes
+  useEffect(() => {
+    if (imageValue) {
+      setPreviewUrl(imageValue);
+    }
+  }, [imageValue]);
+
+  // Handle image change (file selected by user)
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size should be less than 5MB");
+      return;
+    }
+
+    // Upload the image and get the image UUID
+    const result = await onUploadImg(file);
+    if (getImgValue !== undefined) {
+      getImgValue(result?.data?.id); // Pass image UUID to parent
+    }
+
+    // Update the preview URL
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
   return (
-    <div className="flex items-center justify-left">
+    <div className="flex justify-left">
+      {isLoading && <Loading />}
+      {message && (
+        <MessageToaster
+          toastStyle="border-green bg-green1"
+          title="Success!"
+          description={message}
+          isSucceed={true}
+          imgBg="bg-green3"
+          imgBorder="border-green2"
+        />
+      )}
+      {error && (
+        <MessageToaster
+          toastStyle="border-red4 bg-red2"
+          title="Failed!"
+          description={error}
+          isSucceed={false}
+          imgBg="bg-red2"
+          imgBorder="border-red4"
+        />
+      )}
+      <p className="mr-3">{field?.placeholder}</p>
       <label
         htmlFor="image-upload"
         className={cn(
@@ -34,12 +120,13 @@ export default function ImageUploader() {
             src={previewUrl}
             alt="Preview"
             className="w-full h-full object-cover rounded-lg"
+            width={200}
+            height={200}
           />
         ) : (
           <>
             <div className="bg-gray-100 p-2 rounded-full">
               <Image
-               
                 src={uploadCloudImg}
                 alt="Logo"
                 width={30}
@@ -49,13 +136,13 @@ export default function ImageUploader() {
                 loading="eager"
               />
             </div>
-            <span className=" font-semibold text-sm text-red">
+            <span className="font-semibold text-sm text-red">
               Click to upload
             </span>
-            <span className="text-gray text-xs text-center">
+            <span className="text-grayBasic text-xs text-center">
               using camera and from gallery
             </span>
-            <span className="text-gray text-xs">PNG, JPG (max. 5 MB)</span>
+            <span className="text-grayBasic text-xs">PNG, JPG (max. 5 MB)</span>
           </>
         )}
         <input

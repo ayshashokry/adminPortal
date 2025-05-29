@@ -10,8 +10,9 @@ import { Input } from "@ui/input";
 import { EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
 import { FieldValues, UseFormReturn, Path } from "react-hook-form";
 import { useState } from "react";
-import _ from "lodash";
 import ImageUploader from "../ui/imageUploader";
+import { startCase } from "lodash";
+import useAuthStore from "@/store/authStore";
 
 interface FormInputProps<T extends FieldValues> {
   field: {
@@ -19,31 +20,41 @@ interface FormInputProps<T extends FieldValues> {
     name: Path<T>; // Change this from keyof T to Path<T>
     label?: string;
     placeholder?: string;
-    type?: string;
-    required?: boolean;
+    type: string;
+    required: boolean;
     icon?: React.ReactNode;
+    fullWidth?: boolean;
   };
   methods: UseFormReturn<T>;
   formType: string;
+  getImgValue?: (imgUUID: string) => void;
+  profileDetails: any;
+  detailsValues?: any;
 }
 
 export default function FormInput<T extends FieldValues>({
   field,
   methods,
   formType,
+  getImgValue,
+  profileDetails,
+  detailsValues,
 }: FormInputProps<T>) {
   const [showPassword, setShowPassword] = useState(false);
+  const { user } = useAuthStore();
 
   return (
     <FormField
       control={methods.control}
       name={field.name}
       render={({ field: controllerField }) => (
-        <div>
+        <div className={`${field?.fullWidth ? "col-span-2" : ""}`}>
           <FormItem
             className={`${
               formType === "editUserData"
-                ? `grid grid-cols-3 gap-6 items-center ${field.type === "image" ? "items-start" : ""}`
+                ? `grid grid-cols-3 gap-6 items-center ${
+                    field.type === "image" ? "items-start" : ""
+                  }`
                 : ""
             }`}
           >
@@ -53,13 +64,12 @@ export default function FormInput<T extends FieldValues>({
                   formType === "editUserData" ? "w-1/2 text-left" : ""
                 }`}
               >
-                {_.startCase(field.label)}
+                {startCase(field.label)}
                 {field.required && formType !== "editUserData" && (
                   <span className="text-red">*</span>
                 )}
               </FormLabel>
             )}
-
             <FormControl
               className={`${
                 formType === "editUserData" ? "justify-center" : ""
@@ -71,11 +81,26 @@ export default function FormInput<T extends FieldValues>({
                 )}
 
                 {field.type == "image" ? (
-                  <ImageUploader key={field.id} />
+                  <ImageUploader
+                    key={field.id}
+                    field={field}
+                    getImgValue={getImgValue}
+                    imageValue={methods.getValues()?.profileImageId}
+                  />
                 ) : (
                   <Input
+                    autoComplete={field.name}
+                    disabled={
+                      // (formType == "editUserData" ||
+                      formType == "editItemForm" &&
+                      // )
+                      (user?.adminRoleName !== "Super Admin" ||
+                        detailsValues?.adminRoleName == "Super Admin") &&
+                      (field?.name == "mobileNumber" || field?.name == "email")
+                    }
                     {...controllerField}
-                    className="pl-9"
+                    value={controllerField?.value || ""}
+                    className={field.icon ? "pl-9" : ""}
                     placeholder={field.placeholder}
                     type={
                       showPassword && field.type === "password"
@@ -84,7 +109,6 @@ export default function FormInput<T extends FieldValues>({
                     }
                   />
                 )}
-
                 {field.type === "password" && (
                   <span
                     className="absolute right-3 top-2 cursor-pointer"

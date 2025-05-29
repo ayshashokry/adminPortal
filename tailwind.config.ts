@@ -7,11 +7,11 @@ export default {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        inter: ["Inter", "sans-serif"],
-      },
+      // fontFamily: {
+      //   inter: ["Inter", "sans-serif"],
+      // },
       colors: {
-        gray: "#475467",
+        grayBasic: "#475467",
         gray1: "#4B4D50",
         gray2: "#EAECF0",
         gray3: "#667085",
@@ -25,14 +25,19 @@ export default {
         gray11:"#DFE3E8",
         gray12:'#EFF1F5',
         gray13:'#404968',
+        gray14:'#5D6B98',
         black1: "#101828",
         black2:"#344054",
         black3:"#0C111D",
+        black4:'#30374F',
         red: "#FB0101",
         red1:'#D92D20',
         red2:'#FEF3F2',
         red3:'#B42318',
         red4:'#FECDCA',
+        red5:"#ef4444",
+        red6:'#D20000',
+        pink1:'#FFE5E5',
         redDisabled:'#F97066',
         green: "#17B26A",
         green1:"#F6FEF9",

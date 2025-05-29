@@ -1,5 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Merchant, Request, User, Setting, Role } from "./dashboard.interface"; // Import types from an interface file
+import {
+  Merchant,
+  Request,
+  User,
+  Setting,
+  Role,
+  AccountDeletion,
+  MerchantOnBoarding,
+} from "./dashboard.interface"; // Import types from an interface file
 
 // Column Definitions for User
 export const userColumns: ColumnDef<User>[] = [
@@ -15,30 +23,19 @@ export const userColumns: ColumnDef<User>[] = [
   { accessorKey: "status", header: "Status" },
 ];
 
-// Column Definitions for Merchant
-export const merchantColumns: ColumnDef<Merchant>[] = [
-  { accessorKey: "id", header: "ID" },
-  { accessorKey: "name", header: "Name" },
-  { accessorKey: "company", header: "Company" },
-];
 
-// Column Definitions for Request
-export const requestColumns: ColumnDef<Request>[] = [
+export const accountDeletionColumns: ColumnDef<AccountDeletion>[] = [
   { accessorKey: "id", header: "ID" },
-  { accessorKey: "description", header: "Description" },
+  { accessorKey: "requestedBy", header: "Requested By" },
+  { accessorKey: "roleName", header: "Role" },
+  { accessorKey: "RequestedAt", header: "Requested At" },
   { accessorKey: "status", header: "Status" },
 ];
-
-// Column Definitions for Settings (Example)
-export const settingColumns: ColumnDef<Setting>[] = [
+export const merchantOnBoardingColumns: ColumnDef<MerchantOnBoarding>[] = [
   { accessorKey: "id", header: "ID" },
-  { accessorKey: "settingName", header: "Setting Name" },
-  { accessorKey: "value", header: "Value" },
-];
-
-// Column Definitions for Role (Example)
-export const roleColumns: ColumnDef<Role>[] = [
-  { accessorKey: "id", header: "ID" },
-  { accessorKey: "roleName", header: "Role Name" },
-  { accessorKey: "permissions", header: "Permissions" },
+  { accessorKey: "companyName", header: "Company Name" },
+  { accessorKey: "crNumber", header: "CR Number" },
+  { accessorKey: "ownerName", header: "Owner Name" },
+  { accessorKey: "nationalIqamaId", header: "Nationail ID" },
+  { accessorKey: "status", header: "Status" },
 ];

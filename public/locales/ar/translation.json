@@ -2,9 +2,11 @@
   "and": ",",
   "auth": {
     "login": "تسجيل الدخول",
-    "welcomeBack": "Welcome back! Please enter your details.",
+    "welcomeBack": "مرحبا بعودتك , برجاء ادخال بياناتك",
     "forgetPassword": "Forget Password",
     "email": "البريد الالكتروني",
+    "enterEmail":"من فضلك ادخل بريدك الالكتروني",
+    "enterLogPassword":"من فضلك ادخل كلمة المرور",
     "userPhoto": "صورة المستخدم",
     "name": "الاسم",
     "mobile": "رقم الجوال",
@@ -15,8 +17,8 @@
     "confirmPassword": "confirm Password",
     "otp": "الكود",
     "submit": "submit",
-    "confirm": "confirm",
-    "signIn": "sign in",
+    "confirm": "تأكيد",
+    "signIn": "دخول",
     "verify":"Verify",
     "createNewPass": "انشاء كلمة مرور جديدة",
     "enterPassword": "Please enter the new password you need.",
@@ -30,6 +32,10 @@
       "please": "من فضلك",
       "enter": "أدخل"
     }
+  },
+   "lists":{
+"userList":"قائمة المستخدمين"
+
   },
   "language":"EN"
 

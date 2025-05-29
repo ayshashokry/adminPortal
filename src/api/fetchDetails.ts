@@ -19,11 +19,14 @@ export const FetchDetails = async ({
       headers: {
         "Accept-Language": "en",
         Authorization: `${token}`,
+        "Content-Type": "application/json",
+
       },
     });
-    return res.data;
+        return { success: true, data:  res.data };
   } catch (error: any) {
-    console.log("API Error:", error?.response?.data || error?.message);
-    return null;
+       const backendMessage =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message: backendMessage };
   }
 };

@@ -1,25 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
-import Loading from "../layout/Loading";
+import Loading from "@/components/layout/Loading";
 
-export default function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { token,refreshToken } = useAuthStore();
+export default function PrivateRoute({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { hydrated, isAuthenticated } = useAuthStore();
+  const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-
+  const pathname = usePathname();
   useEffect(() => {
-    if (token === null) return;
-    if (!token||!refreshToken) {
+    if (!hydrated) return;
+    if (!isAuthenticated) {
       router.replace("/auth/login");
     } else {
-      setIsLoading(false);
+      setIsChecking(false);
     }
-  }, [token, router]);
+  }, [hydrated, isAuthenticated, pathname]);
 
-  if (isLoading) return <Loading/>;
+  if (isChecking) return <Loading />;
 
   return <>{children}</>;
 }

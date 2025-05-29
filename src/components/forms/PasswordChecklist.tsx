@@ -14,7 +14,6 @@ interface PasswordChecklistProps {
 
 export default function PasswordChecklist({ confirmChecks, methods }: PasswordChecklistProps) {
   const passwordValue=methods.watch("newPassword")
-  console.log('MEEETHODS',methods)
   return (
     <div className="w-[100%] grid grid-cols-2">
       {confirmChecks?.map((item: PasswordRule) => (
@@ -30,7 +29,7 @@ export default function PasswordChecklist({ confirmChecks, methods }: PasswordCh
                 : " border-gray3 text-transparent"
             }`}
           />
-          <span className="text-gray text-sm font-normal not-italic">{item.name}</span>
+          <span className="text-grayBasic text-sm font-normal not-italic">{item.name}</span>
           <Checkbox.Indicator />
         </Checkbox.Root>
       ))}

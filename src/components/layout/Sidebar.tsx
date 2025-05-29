@@ -6,45 +6,52 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
 } from "lucide-react";
-import logo from "@/assets/images/SalesFine.svg";
 
 import Image, { StaticImageData } from "next/image";
 import { links } from "../../data/SidebarLinks";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 interface SidebarProps {
   collapsed: boolean;
   toggleSidebar: () => void;
 }
 
 export default function Sidebar({ collapsed, toggleSidebar }: SidebarProps) {
+  const [isDropLinksOpen, setDropOpen] = useState<number | null>(null);
+  const openLinks = (id: number) => {
+    isDropLinksOpen == id ? setDropOpen(null) : setDropOpen(id);
+  };
   const linkElement = (
     name: string,
     href: string,
-    icon: StaticImageData,
-    isActive: boolean
+    isActive: boolean,
+    icon?: StaticImageData
   ) => {
     return (
       <Link
         key={href}
         href={href}
-        className={`flex items-center py-2 px-1 rounded hover:bg-gray-800 transition-all ${
+        className={`flex items-center py-2 px-1 rounded hover:bg-grayBasic-800 font-medium transition-all ${
           collapsed ? "justify-center" : ""
-        } ${isActive ? "bg-gray5 rounded-md" : "hover:bg-gray-800"}`}
+        } 
+          ${isActive ? "bg-gray5 rounded-md" : "hover:bg-grayBasic-800"}`}
       >
-        <Image
-          alt="icon"
-          width={15}
-          height={15}priority
-          src={icon}
-          className="w-6 h-6"  
-
-        />
-
+        {icon && (
+          <Image
+            alt="icon"
+            width={15}
+            height={15}
+            loading="lazy"
+            src={icon}
+            className="w-6 h-6"
+          />
+        )}
         <span
-          className={`transition-all ${
-            collapsed ? "hidden" : "mx-2"
-          } text-black1`}
+          className={`transition-all ${collapsed ? "hidden" : "mx-2"} ${
+            isActive ? "text-black4" : "text-gray14 "
+          }`}
         >
           {name}
         </span>
@@ -54,26 +61,23 @@ export default function Sidebar({ collapsed, toggleSidebar }: SidebarProps) {
   const pathname = usePathname();
   return (
     <div
-      className={`z-[100] h-screen rounded-lg border border-gray-200 bg-white shadow-sm  p-4 transition-all ${
+      className={`z-[50] max-h-screen overflow-y-scroll overflow-x-hidden rounded-lg border border-gray-200 bg-white shadow-sm  p-2 transition-all ${
         collapsed ? "w-16" : "w-60"
       }`}
     >
-      {!collapsed && (
-        <Image
-          src={logo}
-          alt="Logo"
-          width={137}
-          height={37}
-          className="pl-3 mb-4"
-          priority
-          loading="eager"
-        />
-      )}
+      <Image
+        src="/images/SalesFine.webp"
+        alt="Logo"
+        width={137}
+        height={37}
+        // className="pl-3 mb-4"
+        priority
+      />
       {/* Toggle Button */}
       <div className="flex mb-4">
         {!collapsed && <span className="text-gray4 text-xs pt-1">Menu</span>}
         <button
-          className={`bg-gray-800 rounded w-full flex focus-visible:ring-0 focus-visible:shadow-none focus:outline-none ${
+          className={`bg-grayBasic-800 rounded w-full flex focus-visible:ring-0 focus-visible:shadow-none focus:outline-none ${
             collapsed ? "justify-center" : "justify-end"
           } text-gray3`}
           onClick={toggleSidebar}
@@ -84,58 +88,44 @@ export default function Sidebar({ collapsed, toggleSidebar }: SidebarProps) {
       {/* Links */}
 
       <nav className="space-y-2">
-        {links.map(({ name, href, icon,dropDownLinks }) => {
-          const isActive = pathname.startsWith(href);
-          if (name === "Requests" && dropDownLinks) {
+        {links.map(({ name, href, icon, dropDownLinks, id }) => {
+          if (dropDownLinks) {
             return (
-              <DropdownMenu.Root key={name}>
-               <DropdownMenu.Trigger asChild>
-  <button
-    className={`flex items-center w-full py-2 px-1 rounded hover:bg-gray-800 transition-all ${
-      collapsed ? "justify-center" : "justify-between"
-    } ${isActive ? "bg-gray5 rounded-md" : "hover:bg-gray-800"} text-left`}
-  >
-    <div className="flex items-center">
-      <Image
-        alt="icon"
-        width={15}
-        height={15}
-        src={icon}
-        className="w-6 h-6"priority
-      />
-      {!collapsed && <span className="mx-2 text-black1">{name}</span>}
-    </div>
-    {!collapsed && <ChevronDown size={16} />}
-  </button>
-</DropdownMenu.Trigger>
-        
-                <DropdownMenu.Content
-                  className="bg-white border rounded-lg shadow-lg w-64 p-2 mt-3 ml-3"
-                  align="end"
+              <div key={id} className="mb-4">
+                <p
+                  className="flex cursor-pointer text-gray14 font-medium"
+                  onClick={() => openLinks(id)}
                 >
-                  {dropDownLinks.map((dropLink) => (
-                    <DropdownMenu.Item asChild key={dropLink.href}>
-                      <Link
-                        href={dropLink.href}
-                        className="flex items-center gap-2 px-2 py-2 hover:bg-gray-100 rounded-md text-sm"
-                      >
-                        <Image
-                          alt="Icon"
-                          width={15}
-                          height={15}
-                          src={dropLink.icon}
-                          className="w-5 h-5"priority
-                        />
-                        <span>{dropLink.name}</span>
-                      </Link>
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
+                  <Image
+                    alt="icon"
+                    width={15}
+                    height={15}
+                    loading="lazy"
+                    src={icon}
+                    className="w-6 h-6 ml-1 mr-2"
+                  />
+                  {name}{" "}
+                  {id == isDropLinksOpen ? (
+                    <ChevronUp className="ml-auto" />
+                  ) : (
+                    <ChevronDown className="ml-auto" />
+                  )}
+                </p>
+
+                <ul className="ml-3 mt-2 ">
+                  {id == isDropLinksOpen
+                    ? dropDownLinks?.map((d, index) => (
+                        <li className="" key={index}>
+                          {linkElement(d.name, d.href, pathname == d.href)}
+                        </li>
+                      ))
+                    : null}
+                </ul>
+              </div>
             );
           }
-        
-          return linkElement(name, href, icon, isActive);
+
+          return linkElement(name, href ?? "", pathname == href, icon);
         })}
       </nav>
     </div>

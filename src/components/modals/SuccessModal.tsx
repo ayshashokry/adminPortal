@@ -8,6 +8,7 @@ import {
 } from "@components/ui/dialog";
 import DoneImage from "@/assets/images/Done.svg";
 import Image from "next/image";
+import { Button } from "../ui/button";
 interface ModalProps {
   title: string;
   content: string;
@@ -22,26 +23,17 @@ const SuccessModal: React.FC<ModalProps> = ({
   onClose,
 }) => {
 
-  useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, 7000);
-
-      return clearTimeout(timer);
-    }
-  }, [isOpen,onClose]);
   return (
     <Dialog
       open={isOpen}
       // onOpenChange={onClose}
     >
-      <DialogContent className="p-5 max-w-64 text-center block">
+      <DialogContent className="p-5 max-w-72 text-center block">
         <div className="flex justify-center items-center">
           <Image
             src={DoneImage}
             alt="Logo"
-            width={200}
+            width={350}
             height={100}
             className=""
             priority
@@ -55,6 +47,7 @@ const SuccessModal: React.FC<ModalProps> = ({
         <DialogDescription className="text-sm font-normal not-italic text-gray7 pt-1 tracking-wider">
           {content}
         </DialogDescription>
+        <Button onClick={onClose} className="mt-2">Continue</Button>
       </DialogContent>
     </Dialog>
   );

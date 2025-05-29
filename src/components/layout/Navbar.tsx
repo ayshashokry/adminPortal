@@ -1,36 +1,35 @@
 "use client";
-
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Button } from "@ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { User, LogOut, ChevronDown, Globe } from "lucide-react";
 import { getInitialsChars } from "@utils/helpers";
-import { useTranslation } from "react-i18next";
 import useAuthStore from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Loading from "./Loading";
+import i18n from "@/lib/i18n";
+import { flushSync } from "react-dom";
 
 export default function Navbar() {
-  const { logout, user } = useAuthStore();
+  const { logout, user, hydrated } = useAuthStore();
   const router = useRouter();
-  const { i18n, t } = useTranslation("translation");
   const [isLoading, setLoading] = useState(false);
   const LogoutFunc = () => {
     setLoading(true);
-    router.push('/auth/login')
-    setTimeout(() => {
-      setLoading(false);
+    flushSync(() => {
       logout();
-    }, 2000);
+    });
+    router.replace("/auth/login");
   };
+  if (!hydrated) return null;
   return isLoading ? (
     <Loading />
   ) : (
-    <nav className="fixed top-0 left-0 w-full bg-white border-b border-[#EAECF0] shadow-sm z-50 py-3">
+    <nav className="fixed top-0 left-0 w-full bg-white border-b border-[#EAECF0] shadow-sm z-[40] py-3">
       <div className=" ml-auto pr-8 flex items-center justify-end">
         {/* Profile Dropdown */}
-        <span
+        {/* <span
           onClick={() =>
             i18n?.changeLanguage(i18n.language == "en" ? "ar" : "en")
           }
@@ -39,7 +38,7 @@ export default function Navbar() {
           {t("language")}
           <Globe className="mx-1" />
 
-        </span>
+        </span> */}
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <Button
@@ -47,7 +46,7 @@ export default function Navbar() {
               className="p-2 hover:bg-transparent focus-visible:ring-0"
             >
               <Avatar>
-                <AvatarImage src="/avatar.png" alt="User" />
+                {/* <AvatarImage src="/avatar.png" alt="User" /> */}
                 <AvatarFallback>
                   {getInitialsChars(user?.name || "")}
                 </AvatarFallback>

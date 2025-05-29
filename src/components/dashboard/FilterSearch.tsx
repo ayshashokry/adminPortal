@@ -2,19 +2,56 @@ import React, { memo, useState } from "react";
 import { Search } from "lucide-react";
 import { Button } from "../ui/button";
 import FiltersSection from "./FiltersSection";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
 
 interface Props {
   globalFilter: string;
   setGlobalFilter: React.Dispatch<React.SetStateAction<string>>;
   filtersData: any[];
+  onClickFilter?: (isReset: boolean) => void;
+  tempFilters: {
+    [key: string]: {
+      value: string;
+      keyName: string;
+      id: string;
+      keyType: string;
+    };
+  };
+  isFiltersOpened: boolean;
+  setIsFiltersOpened: React.Dispatch<React.SetStateAction<boolean>>;
+  setTempFilters: React.Dispatch<
+    React.SetStateAction<{
+      [key: string]: {
+        value: string;
+        keyName: string;
+        id: string;
+        keyType: string;
+      };
+    }>
+  >;
+  exportExcel?: () => void;
+  exportPDF?: () => void;
+  isExport: boolean | undefined;
 }
 
 const FilterSearchComponent: React.FC<Props> = ({
   globalFilter,
   setGlobalFilter,
   filtersData,
+  onClickFilter,
+  tempFilters,
+  setTempFilters,
+  isFiltersOpened,
+  setIsFiltersOpened,
+  exportExcel,
+  exportPDF,
+  isExport,
 }: Props) => {
-  const [isFiltersOpened, setIsFiltersOpened] = useState(false);
   return (
     <>
       <div className="grid grid-cols-12 gap-2">
@@ -32,16 +69,39 @@ const FilterSearchComponent: React.FC<Props> = ({
           />
         </div>
         <Button
+          variant={"outline"}
           className="col-span-1"
           onClick={() => setIsFiltersOpened(!isFiltersOpened)}
         >
           Filters
         </Button>
-        <Button className="col-span-1">Export</Button>
+        {/* {isExport && ( */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant={"outline"}>Export</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-20 bg-white mt-2 rounded-md shadow-md p-3">
+            <DropdownMenuItem onClick={exportPDF} className="cursor-pointer">
+              PDF
+            </DropdownMenuItem>
+            <hr />
+            <DropdownMenuItem onClick={exportExcel} className="cursor-pointer">
+              Excel
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {/* )} */}
       </div>
-      {isFiltersOpened ? <FiltersSection filtersData={filtersData} /> : null}
+      {isFiltersOpened ? (
+        <FiltersSection
+          tempFilters={tempFilters}
+          setTempFilters={setTempFilters}
+          onClickFilter={onClickFilter}
+          filtersData={filtersData}
+        />
+      ) : null}
     </>
   );
 };
-const FilterSearch=memo(FilterSearchComponent)
+const FilterSearch = memo(FilterSearchComponent);
 export default FilterSearch;

@@ -1,94 +1,71 @@
 "use client";
 
-import { newPassSchema } from "@/utils/validtions/NewPassSchema";
+import {
+  newPassSchema,
+  newProfilePassSchema,
+} from "@/utils/validtions/NewPassSchema";
 import CustomForm from "./CustomForm";
 import {
-  authInterface,
   confirmChecksInterface,
   newPasswordInterface,
 } from "@/hooks/auth/auth.interface";
-import useAuth from "@hooks/auth/usAuth";
-import { useRouter } from "next/navigation";
-import _ from "lodash";
+import useAuth from "@/hooks/auth/useAuth";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import SuccessModal from "@components/modals/SuccessModal";
 import { LockClosedIcon } from "@radix-ui/react-icons";
-import AuthLayout from "@/app/auth/AuthLayout";
-import { useTranslation } from "react-i18next";
-// type NewPasswordsFormValues = z.infer<typeof newPassSchema>;
+import MessageToaster from "../modals/MessageToaster";
+import { capitalizeString } from "@/utils/helpers";
+import Loading from "../layout/Loading";
+import useAuthStore from "@/store/authStore";
+import { profileSetPassFields, unAuthSetPassFields } from "@/data/formsFields";
 interface createNewPassProps {
   profileSetPass?: boolean;
+  endPoint: string;
 }
 export default function CreateNewPasswordForm({
   profileSetPass = false,
+  endPoint,
 }: createNewPassProps) {
   const defaultValues = {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   };
+  const searchParams = useSearchParams();
+  const token = searchParams?.get("token");
+  // if (!token) return null;
+  const schema = profileSetPass ? newProfilePassSchema : newPassSchema;
 
-  const { onSubmit, methods } = useAuth<typeof newPassSchema, newPasswordInterface>({
-    endPoint: "auth/admin/set-password",
-    schema: newPassSchema,
+  const { onSubmit, methods, error, isLoading } = useAuth<
+    typeof schema,
+    newPasswordInterface
+  >({
+    endPoint: endPoint,
+    schema: profileSetPass ? newProfilePassSchema : newPassSchema,
     defaultValues,
+    token,
   });
   const router = useRouter();
-  const onSubmitFunc = async (data: newPasswordInterface) => {
-    console.log('DDDataaarrrr',data)
-    const result = await onSubmit(data);
-    console.log("NEWPASSRESULT", result);
+  const [message, setMessage] = useState("");
+  const [isOpen, setIsopen] = useState(false);
+  const { logout } = useAuthStore();
+  const openSuccessModal = () => {
+    setIsopen(true);
   };
-  const formFields = profileSetPass
-    ? [
-        {
-          id: 1,
-          name: "oldPassword",
-          label: "old password",
-          placeholder: `Please enter your old password`,
-          type: "password",
-          required: true,
-          icon: <LockClosedIcon className="w-5 h-5" />,
-        },
-        {
-          id: 2,
-          name: "newPassword",
-          label: "auth.New Password",
-          placeholder: `Please enter yout new password`,
-          type: "password",
-          required: true,
-          icon: <LockClosedIcon className="w-5 h-5" />,
-        },
-        {
-          id: 3,
-          name: "confirmPassword",
-          label: "Confirm Password",
-          placeholder: `Please enter confirm password`,
-          type: "password",
-          required: true,
-          icon: <LockClosedIcon className="w-5 h-5" />,
-        },
-      ]
-    : [
-        {
-          id: 1,
-          name: "newPassword",
-          label: "Password",
-          placeholder: `Please enter your password`,
-          type: "password",
-          required: true,
-          icon: <LockClosedIcon className="w-5 h-5" />,
-        },
-        {
-          id: 2,
-          name: "confirmPassword",
-          label: "Rewrite Password",
-          placeholder: `Please Rewrite Password`,
-          type: "password",
-          required: true,
-          icon: <LockClosedIcon className="w-5 h-5" />,
-        },
-      ];
+  const onSubmitFunc = async (data: newPasswordInterface) => {
+    const result = await onSubmit(data);
+    if (result?.data) {
+      setMessage(result?.data?.message);
+      openSuccessModal();
+      if (!profileSetPass) {
+        logout();
+      }
+      setTimeout(() => {
+        router.push(profileSetPass ? "/dashboard/user" : "/auth/login");
+      }, 2000);
+    }
+  };
 
   const [confirmChecks] = useState<confirmChecksInterface[]>([
     {
@@ -116,38 +93,55 @@ export default function CreateNewPasswordForm({
       regex: /.{8,}/,
     },
   ]);
-  const [isOpen, setIsopen] = useState(false);
+
   const onCloseModal = () => {
     setIsopen(false);
-    router.push("/dashboard/merchants");
+    router.push(profileSetPass ? "/dashboard/user" : "/auth/login");
   };
-  const openSuccessModal = () => {
-    setIsopen(true);
-  };
-    const { i18n } = useTranslation("translation");
-  
-  return (
-    <AuthLayout
-      title="Create New Password"
-      headText="Please enter the new password you need."i18n={i18n}
-    >
-      {/* {!profileSetPass && isOpen && (
+
+  return isLoading ? (
+    <Loading />
+  ) : (
+    <>
+      {!profileSetPass && isOpen && (
         <SuccessModal
           isOpen={isOpen}
           onClose={onCloseModal}
-          title="Password Changed Congratulations!"
+          title="Congratulations!"
           content="Your Password Reseting Successfully"
         />
-      )} */}
+      )}
       <CustomForm
         openSuccessModal={openSuccessModal}
-        buttonTitle={_.capitalize("confirm")}
+        buttonTitle={capitalizeString("confirm")}
         formType={profileSetPass ? "profileSetPass" : "createNewPass"}
-        fields={[...formFields]}
+        fields={
+          profileSetPass ? [...profileSetPassFields] : [...unAuthSetPassFields]
+        }
         onSubmitFunc={onSubmitFunc}
         methods={methods}
         confirmChecks={confirmChecks}
       />
-    </AuthLayout>
+      {error && (
+        <MessageToaster
+          toastStyle="border-red4 bg-red2"
+          title="Failed!"
+          description={error?.data?.message}
+          isSucceed={false}
+          imgBg="bg-red2"
+          imgBorder="border-red4"
+        />
+      )}
+      {message && profileSetPass && (
+        <MessageToaster
+          toastStyle="border-green bg-green1"
+          title="Success!"
+          description={message}
+          isSucceed={true}
+          imgBg="bg-green3"
+          imgBorder="border-green2"
+        />
+      )}
+    </>
   );
 }

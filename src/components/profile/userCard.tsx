@@ -7,22 +7,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@ui/avatar";
 import { getInitialsChars } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
-export default function UserCard() {
-  const {user}=useAuthStore()
+export default function UserCard({ userData = {} }: any) {
+  const { user, hydrated } = useAuthStore();
   const router = useRouter();
+  if (!hydrated) return null;
+
   return (
-    <div className="flex flex-col  space-y-2" >
+    <div className="flex flex-col  space-y-2">
       <Card className="w-full max-w-md rounded-lg shadow-lg mx-2">
         <CardHeader className="flex flex-col items-center">
           <Avatar>
             <AvatarImage
-              src="/profile.jpg"
+              src={userData?.fileUrl}
               width={80}
               height={80}
               className="rounded-full object-cover"
               alt="User"
             />
-            <AvatarFallback>{getInitialsChars(user?.name||"")}</AvatarFallback>
+            <AvatarFallback>
+              {getInitialsChars(userData?.name || "")}
+            </AvatarFallback>
           </Avatar>
           <CardTitle className="text-lg font-semibold mt-2">
             {user?.name}
@@ -31,13 +35,17 @@ export default function UserCard() {
         <CardContent className="text-center text-sm text-gray-600">
           <Separator className="mb-4" />
           <div className="flex w-full justify-between">
-            <p className="text-left text-gray text-sm">Mobile Number:</p>
-            <p className="text-right text-black1">+966 000 000 00</p>
+            <p className="text-left text-grayBasic text-sm">Mobile Number:</p>
+            <p className="text-right text-black1">
+              {userData?.mobileNumber !== null
+                ? userData?.countryCode + " " + userData?.mobileNumber
+                : ""}
+            </p>
           </div>
 
           <div className="flex w-full justify-between pt-2">
-            <p className="text-left text-gray">Email Address:</p>
-            <p className="text-right text-black1"> olivia@Hourglass.com</p>
+            <p className="text-left text-grayBasic">Email Address:</p>
+            <p className="text-right text-black1"> {userData?.email}</p>
           </div>
         </CardContent>
       </Card>

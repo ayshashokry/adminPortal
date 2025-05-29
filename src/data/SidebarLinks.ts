@@ -13,41 +13,95 @@ import userSettingsIcon from "@/assets/images/sidemenu/users.svg";
 import settingsIcon from "@/assets/images/sidemenu/settings.svg";
 
 export const links = [
-  { name: "Requests", href: "/dashboard/requests", icon: requestsIcon,dropDownLinks:[
-    {id:1,name:'Merchan Onboarding',icon:requestsIcon,href:'/dashboard/merchantOnBoarging'},
-    {id:2,name:'Vendor Onboarding',icon:requestsIcon,href:'/dashboard/vendorOnBoarging'},
-    {id:3,name:'Salesman Onboarding',icon:requestsIcon,href:'/dashboard/salesmanOnBoarging'},
-    {id:4,name:'Account Deletion',icon:requestsIcon,href:'/dashboard/accountDeletion'}
-  ] },
   {
-    name: "Merchant Leads",
-    href: "/dashboard/merchantLeads",
-    icon: merchantLeadsIcon,
+    id: 0,
+    name: "Requests",
+    icon: requestsIcon,
+    href: "",
+    dropDownLinks: [
+      {
+        id: 1,
+        name: "Merchan Onboarding",
+        href: "/dashboard/merchantOnBoarging",
+      },
+      // {
+      //   id: 2,
+      //   name: "Vendor Onboarding",
+      //   href: "/dashboard/vendorOnBoarging",
+      // },
+      // {
+      //   id: 3,
+      //   name: "Salesman Onboarding",
+      //   href: "/dashboard/salesmanOnBoarging",
+      // },
+      {
+        id: 4,
+        name: "Account Deletion",
+        href: "/dashboard/accountDeletion",
+      },
+    ],
   },
-  { name: "Merchants", href: "/dashboard/merchants", icon: merchantsIcon },
-  { name: "Credit Line", href: "/dashboard/creditLines", icon: creditLineIcon },
-  { name: "Vendors", href: "/dashboard/vendors", icon: vendorIcon },
-  { name: "Invoices", href: "/dashboard/invoices", icon: invoiceIcon },
   {
-    name: "Credit Notes",
-    href: "/dashboard/creditNotes",
-    icon: creditNotesIcon,
+    id: 2,
+    name: "Merchants",
+    icon: merchantsIcon,
+    href: "/dashboard/merchant",
   },
+  // {
+  //   id: 1,
+  //   name: "Merchant Leads",
+  //   href: "/dashboard/merchantLeads",
+  //   icon: merchantLeadsIcon,
+  // },
+  
+  // {
+  //   id: 3,
+  //   name: "Credit Line",
+  //   href: "/dashboard/creditLines",
+  //   icon: creditLineIcon,
+  // },
+  // { id: 4, name: "Vendors", href: "/dashboard/vendors", icon: vendorIcon },
+  // { id: 5, name: "Invoices", href: "/dashboard/invoices", icon: invoiceIcon },
+  // {
+  //   id: 6,
+  //   name: "Credit Notes",
+  //   href: "/dashboard/creditNotes",
+  //   icon: creditNotesIcon,
+  // },
+  // {
+  //   id: 7,
+  //   name: "Transactions",
+  //   href: "/dashboard/transactions",
+  //   icon: transactionsIcon,
+  // },
+  // {
+  //   id: 8,
+  //   name: "Notification Center",
+  //   href: "/dashboard/notificationCenter",
+  //   icon: notificationIcon,
+  // },
+  // {
+  //   id: 9,
+  //   name: "Promotions",
+  //   href: "/dashboard/promotions",
+  //   icon: promotionsIcon,
+  // },
   {
-    name: "Transactions",
-    href: "/dashboard/transactions",
-    icon: transactionsIcon,
-  },
-  {
-    name: "Notification Center",
-    href: "/dashboard/notificationCenter",
-    icon: notificationIcon,
-  },
-  { name: "Promotions", href: "/dashboard/promotions", icon: promotionsIcon },
-  {
+    id: 10,
     name: "User Settings",
-    href: "/dashboard/user",
     icon: userSettingsIcon,
+    dropDownLinks: [
+      {
+        id: 1,
+        name: "User Management",
+        href: "/dashboard/user",
+      },
+      // {
+      //   id: 2,
+      //   name: "Roles and permessions",
+      //   href: "/dashboard/roles",
+      // },
+    ],
   },
-  { name: "Settings", href: "/dashboard/settings", icon: settingsIcon },
+  // { id: 11, name: "Settings", href: "/dashboard/settings", icon: settingsIcon },
 ];
